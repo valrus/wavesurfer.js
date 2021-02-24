@@ -129,9 +129,11 @@ export default class RegionsPlugin {
 
         this._onBackendCreated = () => {
             this.wrapper = this.wavesurfer.drawer.wrapper;
+            this.orientation = this.wavesurfer.drawer.orientation;
             if (this.params.regions) {
                 this.params.regions.forEach(region => {
-                    region.edgeScrollWidth = this.params.edgeScrollWidth || this.wrapper.clientWidth * 0.05;
+                    region.edgeScrollWidth = this.params.edgeScrollWidth ||
+                        this.wrapper[this.orientation.attrFor('clientWidth')] * 0.05;
                     this.add(region);
                 });
             }
@@ -239,8 +241,8 @@ export default class RegionsPlugin {
 
             // Update scroll position
             let scrollLeft =
-                this.wrapper.scrollLeft + scrollSpeed * scrollDirection;
-            this.wrapper.scrollLeft = scrollLeft = Math.min(
+                this.wrapper[this.orientation.attrFor('scrollLeft')] + scrollSpeed * scrollDirection;
+            this.wrapper[this.orientation.attrFor('scrollLeft')] = scrollLeft = Math.min(
                 maxScroll,
                 Math.max(0, scrollLeft)
             );
@@ -268,7 +270,8 @@ export default class RegionsPlugin {
             touchId = e.targetTouches ? e.targetTouches[0].identifier : null;
 
             // Store for scroll calculations
-            maxScroll = this.wrapper.scrollWidth - this.wrapper.clientWidth;
+            maxScroll = this.wrapper[this.orientation.attrFor('scrollWidth')] -
+                this.wrapper[this.orientation.attrFor('clientWidth')];
             wrapperRect = this.wrapper.getBoundingClientRect();
 
             drag = true;
@@ -348,12 +351,12 @@ export default class RegionsPlugin {
             });
 
             // If scrolling is enabled
-            if (scroll && container.clientWidth < this.wrapper.scrollWidth) {
+            if (scroll && container[this.orientation.attrFor('clientWidth')] < this.wrapper[this.orientation.attrFor('scrollWidth')]) {
                 // Check threshold based on mouse
-                const x = e.clientX - wrapperRect.left;
+                const x = e.clientX - wrapperRect[this.orientation.attrFor('left')];
                 if (x <= scrollThreshold) {
                     scrollDirection = -1;
-                } else if (x >= wrapperRect.right - scrollThreshold) {
+                } else if (x >= wrapperRect[this.orientation.attrFor('right')] - scrollThreshold) {
                     scrollDirection = 1;
                 } else {
                     scrollDirection = null;
